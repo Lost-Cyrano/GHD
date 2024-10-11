@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur GDH Militaire</title>
+    <style>
+        /* Police d'écriture militaire et style global */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #1c1c1c;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: url('https://www.transparenttextures.com/patterns/army.png'), linear-gradient(145deg, #4a4a4a 40%, #262626 100%);
+        }
+        
+        .converter-container {
+            background-color: #2f2f2f;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid #4a6932;
+        }
+        
+        h1 {
+            font-size: 26px;
+            color: #d4af37;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #4a6932;
+            border-radius: 8px;
+            background-color: #333;
+            color: #e0e0e0;
+            font-size: 18px;
+            margin-bottom: 15px; /* Espace entre les éléments */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box; /* Assure que la taille inclut le padding et les bordures */
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            background-color: #3a3a3a;
+            box-shadow: 0 0 10px #4a6932;
+            outline: none;
+        }
+        
+        button {
+            background-color: #4a6932;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            height: 50px; /* Uniformiser la hauteur des boutons */
+            margin-top: 10px; /* Espace entre les éléments au-dessus des boutons */
+        }
+        
+        button:hover {
+            background-color: #5a7b3e;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+        
+        .copy-btn {
+            margin-up: 1000px; /* Espace entre les éléments au-dessus des boutons de copie */
+            background-color: #366e2c;
+        }
+        
+        .copy-btn:hover {
+            background-color: #4a6932;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+        
+        textarea {
+            height: 100px;
+            resize: none;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px; /* Espace entre les éléments de texte */
+        }
+        
+        /* Ajout d'une animation subtile */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .converter-container {
+            animation: fadeIn 1.2s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="converter-container">
+    <h1>Convertisseur GDH Militaire</h1>
+    
+    <input type="text" id="input" placeholder="Entrez une date traditionnelle ou GDH">
+    <button onclick="convert()">Convertir</button>
+
+    <textarea id="result" readonly placeholder="Résultat ici..."></textarea>
+    <button class="copy-btn" onclick="copyToClipboard()">Copier le résultat</button>
+
+    <textarea id="aero-result" readonly placeholder="Alphabet militaire ici..."></textarea>
+    <button class="copy-btn" onclick="copyAeroToClipboard()">Copier Alphabet</button>
+</div>
+
+
+<script>
+    // Conversion des chiffres en mots et des lettres en alphabet militaire
+    function convertToAeroAlphabet(gdh) {
+        const alphabetMap = {
+            'A': 'Alpha', 'B': 'Bravo', 'C': 'Charlie', 'D': 'Delta', 'E': 'Echo',
+            'F': 'Foxtrot', 'G': 'Golf', 'H': 'Hotel', 'I': 'India', 'J': 'Juliett',
+            'K': 'Kilo', 'L': 'Lima', 'M': 'Mike', 'N': 'November', 'O': 'Oscar',
+            'P': 'Papa', 'Q': 'Quebec', 'R': 'Romeo', 'S': 'Sierra', 'T': 'Tango',
+            'U': 'Uniform', 'V': 'Victor', 'W': 'Whiskey', 'X': 'X-ray', 'Y': 'Yankee', 'Z': 'Zulu',
+            '1': 'Unité', '2': 'Deux', '3': 'Trois', '4': 'Quatre', '5': 'Cinq', 
+            '6': 'Six', '7': 'Sept', '8': 'Huit', '9': 'Neuf', '0': 'Zéro'
+        };
+
+        let aeroGDH = '';
+        for (let char of gdh) {
+            if (alphabetMap[char.toUpperCase()]) {
+                aeroGDH += alphabetMap[char.toUpperCase()] + ' ';
+            } else {
+                aeroGDH += char + ' ';
+            }
+        }
+
+        document.getElementById('aero-result').value = aeroGDH.trim();
+    }
+
+    // Fonction principale de conversion
+    function convert() {
+        const input = document.getElementById('input').value.trim();
+
+        if (isGDHFormat(input)) {
+            convertToTraditional(input);
+        } else {
+            convertToGDH(input);
+        }
+    }
+
+    // Vérifie si l'entrée est au format GDH
+    function isGDHFormat(input) {
+        return /^[0-9]{2}[0-9]{2}[0-9]{2} B [A-Z]{3} [0-9]{2}$/.test(input);
+    }
+
+    // Conversion d'une date traditionnelle en GDH
+    function convertToGDH(traditionalDate) {
+        const dateObj = new Date(traditionalDate);
+
+        if (isNaN(dateObj.getTime())) {
+            alert("Veuillez saisir une date valide.");
+            return;
+        }
+
+        const day = String(dateObj.getUTCDate()).padStart(2, '0');
+        const month = dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+        const year = String(dateObj.getUTCFullYear()).slice(-2);
+        const hours = String(dateObj.getUTCHours()).padStart(2, '0');
+        const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
+        const gdh = `${day}${hours}${minutes} B ${month} ${year}`;
+
+        document.getElementById('result').value = gdh;
+        convertToAeroAlphabet(gdh);
+    }
+
+    // Conversion d'un GDH en date traditionnelle
+    function convertToTraditional(gdh) {
+        const regex = /^(\d{2})(\d{2})(\d{2}) B ([A-Z]{3}) (\d{2})$/;
+        const match = gdh.match(regex);
+
+        if (!match) {
+            alert("Veuillez saisir un GDH valide.");
+            return;
+        }
+
+        const day = match[1];
+        const hours = match[2];
+        const minutes = match[3];
+        const month = match[4];
+        const year = '20' + match[5];
+
+        const monthIndex = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'].indexOf(month);
+        if (monthIndex === -1) {
+            alert("Mois invalide dans le GDH.");
+            return;
+        }
+
+        const traditionalDate = new Date(Date.UTC(year, monthIndex, day, hours, minutes));
+        document.getElementById('result').value = traditionalDate.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
+        convertToAeroAlphabet(gdh);
+    }
+
+    // Fonction pour copier le résultat
+    function copyToClipboard() {
+        const result = document.getElementById('result');
+        result.select();
+        document.execCommand('copy');
+        alert("Résultat copié !");
+    }
+
+    // Fonction pour copier le GDH en alphabet aéroportuaire
+    function copyAeroToClipboard() {
+        const aeroResult = document.getElementById('aero-result');
+        aeroResult.select();
+        document.execCommand('copy');
+        alert("Alphabet copié !");
+    }
+</script>
+
+</body>
+</html>
