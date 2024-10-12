@@ -3,195 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Convertisseur GDH Militaire</title>
+    <title>Convertisseur de Date GDH</title>
     <style>
-        /* Police d'écriture militaire et style global */
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        
         body {
-            font-family: 'Share Tech Mono', monospace;
-            background-color: #1c1c1c;
-            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1d;
+            color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: url('https://www.transparenttextures.com/patterns/army.png'), linear-gradient(145deg, #4a4a4a 40%, #262626 100%);
+            align-items: flex-start;
+            min-height: 100vh;
+            flex-direction: column;
         }
-        
-        .converter-container {
-            background-color: #2f2f2f;
-            padding: 30px;
+
+        .container {
+            background-color: #2c3e50;
+            padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-            max-width: 450px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             width: 100%;
-            text-align: center;
-            border: 2px solid #4a6932;
-        }
-        
-        h1 {
-            font-size: 26px;
-            color: #d4af37;
+            max-width: 600px;
             margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
-        
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #4a6932;
-            border-radius: 8px;
-            background-color: #333;
-            color: #e0e0e0;
-            font-size: 18px;
-            margin-bottom: 15px; /* Espace entre les éléments */
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            box-sizing: border-box; /* Assure que la taille inclut le padding et les bordures */
+
+        h1 {
+            color: #ecf0f1;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
         }
-        
-        input[type="text"]:focus, textarea:focus {
-            background-color: #3a3a3a;
-            box-shadow: 0 0 10px #4a6932;
-            outline: none;
-        }
-        
-        button {
-            background-color: #4a6932;
-            color: #fff;
-            padding: 15px;
+
+        input, button {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin: 10px 0;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            width: 100%;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            height: 50px; /* Uniformiser la hauteur des boutons */
-            margin-top: 10px; /* Espace entre les éléments au-dessus des boutons */
-        }
-        
-        button:hover {
-            background-color: #5a7b3e;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-        }
-        
-        .copy-btn {
-            margin-up: 1000px; /* Espace entre les éléments au-dessus des boutons de copie */
-            background-color: #366e2c;
-        }
-        
-        .copy-btn:hover {
-            background-color: #4a6932;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-        }
-        
-        textarea {
-            height: 100px;
-            resize: none;
+            border-radius: 5px;
             font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px; /* Espace entre les éléments de texte */
         }
-        
-        /* Ajout d'une animation subtile */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        input {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border: 1px solid #7f8c8d;
         }
-        
-        .converter-container {
-            animation: fadeIn 1.2s ease-in-out;
+
+        button {
+            background-color: #e74c3c;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+
+        .section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row > div {
+            flex: 1;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            background-color: #3498db;
+            padding: 15px;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        #ghd-output, #trad-output {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #1abc9c;
+            border-radius: 10px;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .copy-btn {
+            background-color: #3498db;
+            padding: 10px;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        /* Style spécifique pour une organisation en colonne */
+        .toggle-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .input-inline {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-inline input {
+            width: 48%;
+        }
+
+        .highlight {
+            color: #f39c12;
         }
     </style>
 </head>
 <body>
 
-<div class="converter-container">
-    <h1>Convertisseur GDH Militaire</h1>
-    
-    <input type="text" id="input" placeholder="Entrez une date traditionnelle ou GDH">
-    <button onclick="convert()">Convertir</button>
+<div class="container">
+    <button class="toggle-btn" onclick="toggleSection('section1')">Convertir en Date GDH</button>
+    <div id="section1" class="section">
+        <h1 class="highlight">Date Traditionnelle → GDH</h1>
+        <div class="input-inline">
+            <input type="number" id="day" placeholder="Jour (1-31)" min="1" max="31">
+            <input type="number" id="month" placeholder="Mois (1-12)" min="1" max="12">
+        </div>
+        <input type="number" id="year" placeholder="Année" min="1900" max="2100">
+        <div class="input-inline">
+            <input type="number" id="hours" placeholder="Heures (00-23)" min="0" max="23">
+            <input type="number" id="minutes" placeholder="Minutes (00-59)" min="0" max="59">
+        </div>
 
-    <textarea id="result" readonly placeholder="Résultat ici..."></textarea>
-    <button class="copy-btn" onclick="copyToClipboard()">Copier le résultat</button>
+        <button onclick="convertToGDH()">Convertir en GDH</button>
 
-    <textarea id="aero-result" readonly placeholder="Alphabet militaire ici..."></textarea>
-    <button class="copy-btn" onclick="copyAeroToClipboard()">Copier Alphabet</button>
+        <div id="ghd-output" style="display:none;"></div>
+        <button class="copy-btn" onclick="copyGDH()" style="display:none;">Copier</button>
+    </div>
 </div>
 
+<div class="container">
+    <button class="toggle-btn" onclick="toggleSection('section2')">Convertir en Date Traditionnelle</button>
+    <div id="section2" class="section">
+        <h1 class="highlight">Date GDH → Traditionnelle</h1>
+        <input type="text" id="gdh" placeholder="Entrez une date GDH (ex : 101730Z JUN 11)">
+        <button onclick="convertToTraditional()">Convertir en Date Traditionnelle</button>
+
+        <div id="trad-output" style="display:none;"></div>
+        <button class="copy-btn" onclick="copyTraditional()" style="display:none;">Copier</button>
+    </div>
+</div>
 
 <script>
-    // Conversion des chiffres en mots et des lettres en alphabet militaire
-    function convertToAeroAlphabet(gdh) {
-        const alphabetMap = {
-            'A': 'Alpha', 'B': 'Bravo', 'C': 'Charlie', 'D': 'Delta', 'E': 'Echo',
-            'F': 'Foxtrot', 'G': 'Golf', 'H': 'Hotel', 'I': 'India', 'J': 'Juliett',
-            'K': 'Kilo', 'L': 'Lima', 'M': 'Mike', 'N': 'November', 'O': 'Oscar',
-            'P': 'Papa', 'Q': 'Quebec', 'R': 'Romeo', 'S': 'Sierra', 'T': 'Tango',
-            'U': 'Uniform', 'V': 'Victor', 'W': 'Whiskey', 'X': 'X-ray', 'Y': 'Yankee', 'Z': 'Zulu',
-            '1': 'Unité', '2': 'Deux', '3': 'Trois', '4': 'Quatre', '5': 'Cinq', 
-            '6': 'Six', '7': 'Sept', '8': 'Huit', '9': 'Neuf', '0': 'Zéro'
-        };
-
-        let aeroGDH = '';
-        for (let char of gdh) {
-            if (alphabetMap[char.toUpperCase()]) {
-                aeroGDH += alphabetMap[char.toUpperCase()] + ' ';
-            } else {
-                aeroGDH += char + ' ';
-            }
-        }
-
-        document.getElementById('aero-result').value = aeroGDH.trim();
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        section.style.display = section.style.display === 'none' || section.style.display === '' ? 'block' : 'none';
     }
 
-    // Fonction principale de conversion
-    function convert() {
-        const input = document.getElementById('input').value.trim();
-
-        if (isGDHFormat(input)) {
-            convertToTraditional(input);
-        } else {
-            convertToGDH(input);
-        }
+    function padNumber(num, length) {
+        return num.toString().padStart(length, '0');
     }
 
-    // Vérifie si l'entrée est au format GDH
-    function isGDHFormat(input) {
-        return /^[0-9]{2}[0-9]{2}[0-9]{2} B [A-Z]{3} [0-9]{2}$/.test(input);
-    }
+    function convertToGDH() {
+        let day = document.getElementById('day').value;
+        let month = document.getElementById('month').value;
+        let year = document.getElementById('year').value;
+        let hours = document.getElementById('hours').value;
+        let minutes = document.getElementById('minutes').value;
 
-    // Conversion d'une date traditionnelle en GDH
-    function convertToGDH(traditionalDate) {
-        const dateObj = new Date(traditionalDate);
-
-        if (isNaN(dateObj.getTime())) {
-            alert("Veuillez saisir une date valide.");
+        if (!day || !month || !year || !hours || !minutes) {
+            alert("Veuillez remplir tous les champs.");
             return;
         }
 
-        const day = String(dateObj.getUTCDate()).padStart(2, '0');
-        const month = dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-        const year = String(dateObj.getUTCFullYear()).slice(-2);
-        const hours = String(dateObj.getUTCHours()).padStart(2, '0');
-        const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
-        const gdh = `${day}${hours}${minutes} B ${month} ${year}`;
+        day = padNumber(day, 2);
+        month = padNumber(month, 2);
+        year = padNumber(year, 4);
+        hours = padNumber(hours, 2);
+        minutes = padNumber(minutes, 2);
 
-        document.getElementById('result').value = gdh;
-        convertToAeroAlphabet(gdh);
+        const localDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
+        const utcHours = localDate.getUTCHours();
+        const utcMinutes = localDate.getUTCMinutes();
+
+        const dayStr = padNumber(localDate.getUTCDate(), 2);
+        const hoursStr = padNumber(utcHours, 2);
+        const minutesStr = padNumber(utcMinutes, 2);
+
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        const monthStr = months[localDate.getUTCMonth()];
+        const yearStr = String(localDate.getUTCFullYear()).slice(-2);
+
+        const gdh = `${dayStr}${hoursStr}${minutesStr}Z ${monthStr} ${yearStr}`;
+
+        document.getElementById('ghd-output').textContent = `GDH : ${gdh}`;
+        document.getElementById('ghd-output').style.display = 'block';
+        document.querySelector('.copy-btn').style.display = 'inline-block';
     }
 
-    // Conversion d'un GDH en date traditionnelle
-    function convertToTraditional(gdh) {
-        const regex = /^(\d{2})(\d{2})(\d{2}) B ([A-Z]{3}) (\d{2})$/;
-        const match = gdh.match(regex);
+    function copyGDH() {
+        const ghdText = document.getElementById('ghd-output').textContent;
+        navigator.clipboard.writeText(ghdText).then(() => {
+            alert("Date GDH copiée dans le presse-papier !");
+        }).catch(err => {
+            console.error('Erreur lors de la copie: ', err);
+        });
+    }
+
+    function convertToTraditional() {
+        const gdhInput = document.getElementById('gdh').value.trim();
+
+        const gdhRegex = /^(\d{2})(\d{2})(\d{2})Z ([A-Z]{3}) (\d{2})$/;
+        const match = gdhInput.match(gdhRegex);
 
         if (!match) {
-            alert("Veuillez saisir un GDH valide.");
+            alert("Format GDH incorrect. Utilisez DDHHmmZ Mon YY.");
             return;
         }
 
@@ -199,33 +238,32 @@
         const hours = match[2];
         const minutes = match[3];
         const month = match[4];
-        const year = '20' + match[5];
+        const year = `20${match[5]}`;
 
-        const monthIndex = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'].indexOf(month);
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
+ "SEP", "OCT", "NOV", "DEC"];
+        const monthIndex = months.indexOf(month);
+
         if (monthIndex === -1) {
-            alert("Mois invalide dans le GDH.");
+            alert("Mois invalide.");
             return;
         }
 
-        const traditionalDate = new Date(Date.UTC(year, monthIndex, day, hours, minutes));
-        document.getElementById('result').value = traditionalDate.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
-        convertToAeroAlphabet(gdh);
+        const utcDate = new Date(Date.UTC(year, monthIndex, day, hours, minutes));
+        const localDate = utcDate.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
+
+        document.getElementById('trad-output').textContent = `Date traditionnelle : ${localDate}`;
+        document.getElementById('trad-output').style.display = 'block';
+        document.querySelector('.copy-btn').style.display = 'inline-block';
     }
 
-    // Fonction pour copier le résultat
-    function copyToClipboard() {
-        const result = document.getElementById('result');
-        result.select();
-        document.execCommand('copy');
-        alert("Résultat copié !");
-    }
-
-    // Fonction pour copier le GDH en alphabet aéroportuaire
-    function copyAeroToClipboard() {
-        const aeroResult = document.getElementById('aero-result');
-        aeroResult.select();
-        document.execCommand('copy');
-        alert("Alphabet copié !");
+    function copyTraditional() {
+        const tradText = document.getElementById('trad-output').textContent;
+        navigator.clipboard.writeText(tradText).then(() => {
+            alert("Date traditionnelle copiée dans le presse-papier !");
+        }).catch(err => {
+            console.error('Erreur lors de la copie: ', err);
+        });
     }
 </script>
 
