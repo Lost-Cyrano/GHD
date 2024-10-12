@@ -177,6 +177,15 @@
         return num.toString().padStart(length, '0');
     }
 
+    function isSummer(month, day) {
+        // Les dates de l'été en France sont généralement du 21 juin au 22 septembre.
+        // 21 juin (day 21, month 6) au 22 septembre (day 22, month 9)
+        if (month < 6 || (month === 6 && day < 21) || (month === 9 && day > 22) || month > 9) {
+            return false;
+        }
+        return true;
+    }
+
     function convertToGDH() {
         let day = document.getElementById('day').value;
         let month = document.getElementById('month').value;
@@ -188,28 +197,44 @@
             alert("Veuillez remplir tous les champs.");
             return;
         }
+        
+        // Créez un objet Date à partir des valeurs saisies
+		let dateInput = new Date(year, month - 1, day, hours, minutes);
 
-        day = padNumber(day, 2);
-        month = padNumber(month, 2);
-        year = padNumber(year, 4);
-        hours = padNumber(hours, 2);
-        minutes = padNumber(minutes, 2);
+		// Fonction pour déterminer le dernier dimanche d'un mois donné
+		function lastSundayOfMonth(year, month) {
+		   let lastDate = new Date(year, month + 1, 0); // Dernier jour du mois
+ 		   let lastSunday = lastDate.getDate() - lastDate.getDay(); // Date du dernier dimanche
+		    return new Date(year, month, lastSunday);
+		}
 
-        const localDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
-        const utcHours = localDate.getUTCHours();
-        const utcMinutes = localDate.getUTCMinutes();
+		// Récupération des dates limites pour le changement d'heure
+		let startDST = lastSundayOfMonth(year, 2); // Dernier dimanche de mars
+		let endDST = lastSundayOfMonth(year, 9); // Dernier dimanche d'octobre
 
-        const dayStr = padNumber(localDate.getUTCDate(), 2);
-        const hoursStr = padNumber(utcHours, 2);
-        const minutesStr = padNumber(utcMinutes, 2);
+		// Vérifiez si la date est dans la période d'heure d'été
+		if (dateInput >= startDST && dateInput < endDST) {
+		    const UTC = "A";
+		} else {
+		    const UTC = "B";
+		}
 
-        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-        const monthStr = months[localDate.getUTCMonth()];
-        const yearStr = String(localDate.getUTCFullYear()).slice(-2);
+		// Pad number function (assuming it exists elsewhere)
+		day = padNumber(day, 2);
+		month = padNumber(month, 2);
+		year = padNumber(year, 4);
+		hours = padNumber(hours, 2);
+		minutes = padNumber(minutes, 2);
 
-        const gdh = `${dayStr}${hoursStr}${minutesStr}Z ${monthStr} ${yearStr}`;
+		const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-        document.getElementById('ghd-output').textContent = `GDH : ${gdh}`;
+		// Since month is zero-based, you should use `month - 1` to get the correct index.
+		const monthStr = months[month - 1];
+		let yearStr = String(year).slice(-2); // Get last two digits of the year
+
+        const gdh = `${day}${hours}${minutes} B ${monthStr} ${yearStr}`;
+
+        document.getElementById('ghd-output').textContent = `${gdh}`;
         document.getElementById('ghd-output').style.display = 'block';
         document.querySelector('.copy-btn').style.display = 'inline-block';
     }
@@ -226,12 +251,17 @@
     function convertToTraditional() {
         const gdhInput = document.getElementById('gdh').value.trim();
 
-        const gdhRegex = /^(\d{2})(\d{2})(\d{2})Z ([A-Z]{3}) (\d{2})$/;
+        const gdhRegex = /^(\d{2})(\d{2})(\d{2}) B ([A-Z]{3}) (\d{2})$/;
         const match = gdhInput.match(gdhRegex);
 
         if (!match) {
-            alert("Format GDH incorrect. Utilisez DDHHmmZ Mon YY.");
-            return;
+        	const gdhRegex = /^(\d{2})(\d{2})(\d{2}) A ([A-Z]{3}) (\d{2})$/;
+        	const match = gdhInput.match(gdhRegex);
+        
+        	if (!match) {
+         	   alert("Format GDH incorrect. Utilisez DDHHmmX Mon YY.");
+         	   return;
+        	}
         }
 
         const day = match[1];
@@ -240,8 +270,7 @@
         const month = match[4];
         const year = `20${match[5]}`;
 
-        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
- "SEP", "OCT", "NOV", "DEC"];
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
         const monthIndex = months.indexOf(month);
 
         if (monthIndex === -1) {
@@ -249,10 +278,7 @@
             return;
         }
 
-        const utcDate = new Date(Date.UTC(year, monthIndex, day, hours, minutes));
-        const localDate = utcDate.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
-
-        document.getElementById('trad-output').textContent = `Date traditionnelle : ${localDate}`;
+        document.getElementById('trad-output').textContent = `Le ${day}/${monthIndex+1}/${year} à ${hours}:${minutes} `;
         document.getElementById('trad-output').style.display = 'block';
         document.querySelector('.copy-btn').style.display = 'inline-block';
     }
@@ -266,6 +292,5 @@
         });
     }
 </script>
-
 </body>
 </html>
